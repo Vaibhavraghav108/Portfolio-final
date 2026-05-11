@@ -299,3 +299,15 @@ export const FLAT_COMMANDS = [
 }));
 
 export const NAV_COMMANDS = COMMAND_DATABASE.Navigation;
+
+export const CLIENTS = [
+  "Vanguard Systems",
+  "Neural Dynamics",
+  "Global Tech Corp",
+  "Cyberdyne AI",
+  "Nexus Financial",
+  "Aether Security",
+  "Prime Robotics",
+  "Zenith Labs",
+  "Vertex Solutions",
+];
