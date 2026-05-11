@@ -140,6 +140,19 @@ body {
     0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
 /* Dotted border utility */
 .border-dotted-custom {
   border-style: dotted;

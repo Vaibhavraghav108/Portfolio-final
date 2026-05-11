@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Lenis from "lenis";
 import { Mail, Phone, ExternalLink, Globe, MapPin, Code, Briefcase, GitBranch } from "lucide-react";
 import { WindowFrame } from "@/components/Terminal/WindowFrame";
 import { AsciiHeader } from "@/components/Terminal/AsciiHeader";
@@ -247,6 +248,32 @@ export default function TerminalWindow() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    
+    const lenis = new Lenis({
+      wrapper: scrollRef.current,
+      content: scrollRef.current.firstElementChild as HTMLElement,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
   }, []);
 
   // Destruct Sequence
@@ -618,22 +645,24 @@ export default function TerminalWindow() {
           )}
 
           <div className={`flex-1 flex flex-col min-h-0 transition-all duration-1000 ${isDestructing && destructCount === 0 ? 'grayscale blur-sm pointer-events-none' : ''}`}>
-            <div id="terminal-scroll-container" ref={scrollRef} className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden mb-4 pr-2 flex flex-col space-y-6 scroll-smooth">
-              {history.map((block) => (
-                <div key={block.id} className="w-full">
-                  {block.command && (
-                    <div className="flex items-center text-[var(--color-terminal-text)] font-mono text-sm mb-2 opacity-70">
-                      <span className="text-[var(--color-terminal-peach)] mr-3 font-bold select-none">&gt;</span>
-                      <span className="font-bold">{block.command}</span>
-                    </div>
-                  )}
-                  <AnimatePresence mode="wait">
-                    <motion.div initial={block.command !== '' ? { opacity: 0, y: 10 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                      {renderContent(block.view)}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              ))}
+            <div id="terminal-scroll-container" ref={scrollRef} className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden mb-4 pr-2 scroll-smooth">
+              <div className="flex flex-col space-y-6">
+                {history.map((block) => (
+                  <div key={block.id} className="w-full">
+                    {block.command && (
+                      <div className="flex items-center text-[var(--color-terminal-text)] font-mono text-sm mb-2 opacity-70">
+                        <span className="text-[var(--color-terminal-peach)] mr-3 font-bold select-none">&gt;</span>
+                        <span className="font-bold">{block.command}</span>
+                      </div>
+                    )}
+                    <AnimatePresence mode="wait">
+                      <motion.div initial={block.command !== '' ? { opacity: 0, y: 10 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                        {renderContent(block.view)}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="border-t border-dotted border-[var(--color-terminal-border)] pt-4 mt-auto shrink-0 transition-all">
