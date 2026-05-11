@@ -183,11 +183,11 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Enter") triggerExit();
+      if (e.key === "Enter" && currentStep >= SEQUENCE.length - 1) triggerExit();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [triggerExit]);
+  }, [triggerExit, currentStep]);
 
   return (
     <AnimatePresence mode="wait">
