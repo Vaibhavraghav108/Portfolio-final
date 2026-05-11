@@ -300,11 +300,12 @@ export default function TerminalWindow() {
     if (commandDef || baseCommand === "git log") {
       const canonicalCmd = commandDef?.cmd || baseCommand;
 
-      if (commandDef && "action" in commandDef && commandDef.action === "url" && "payload" in commandDef) {
-        if (commandDef.payload?.startsWith("mailto:") || commandDef.payload?.startsWith("tel:")) {
-          window.location.href = commandDef.payload;
+      if (commandDef && "action" in commandDef && (commandDef as any).action === "url" && "payload" in commandDef) {
+        const payload = (commandDef as any).payload;
+        if (typeof payload === "string" && (payload.startsWith("mailto:") || payload.startsWith("tel:"))) {
+          window.location.href = payload;
         } else {
-          window.open(commandDef.payload, "_blank");
+          window.open(payload as string, "_blank");
         }
         return;
       }
