@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #0D0D12;
+  --color-foreground: #E0E0E6;
+  --color-terminal-bg: rgba(18, 18, 23, 0.85);
+  --color-terminal-text: #E0E0E6;
+  --color-terminal-peach: #D97757;
+  --color-terminal-green: #9ece6a;
+  --color-terminal-blue: #9D8DF1;
+  --color-terminal-purple: #9D8DF1;
+  --color-terminal-red: #f7768e;
+  --color-terminal-border: rgba(255, 255, 255, 0.1);
+  --color-terminal-surface: rgba(18, 18, 23, 0.85);
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+:root,
+.theme-dark {
+  --background: #0D0D12;
+  --foreground: #E0E0E6;
+  --color-terminal-bg: rgba(18, 18, 23, 0.85);
+  --color-terminal-text: #E0E0E6;
+  --color-terminal-peach: #D97757;
+  --color-terminal-green: #9ece6a;
+  --color-terminal-blue: #9D8DF1;
+  --color-terminal-purple: #9D8DF1;
+  --color-terminal-border: rgba(255, 255, 255, 0.1);
+}
+
+.theme-light {
+  --background: #f0f0f5;
+  --foreground: #1e1e2e;
+  --color-terminal-bg: rgba(255, 255, 255, 0.9);
+  --color-terminal-text: #1e1e2e;
+  --color-terminal-peach: #d25f3b;
+  /* Darker peach for contrast */
+  --color-terminal-green: #4b8b3b;
+  --color-terminal-blue: #5b4db8;
+  --color-terminal-purple: #5b4db8;
+  --color-terminal-border: rgba(0, 0, 0, 0.1);
+}
+
+.theme-retro {
+  --background: #051405;
+  --foreground: #33ff33;
+  --color-terminal-bg: rgba(5, 20, 5, 0.95);
+  --color-terminal-text: #33ff33;
+  --color-terminal-peach: #33ff33;
+  --color-terminal-green: #33ff33;
+  --color-terminal-blue: #33ff33;
+  --color-terminal-purple: #33ff33;
+  --color-terminal-border: rgba(51, 255, 51, 0.3);
+}
+
+.theme-glass {
+  --background: transparent;
+  --foreground: #ffffff;
+  --color-terminal-bg: rgba(255, 255, 255, 0.1);
+  --color-terminal-text: #ffffff;
+  --color-terminal-peach: #ffffff;
+  --color-terminal-green: #ffffff;
+  --color-terminal-blue: #ffffff;
+  --color-terminal-purple: #ffffff;
+  --color-terminal-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background-color: var(--color-terminal-peach);
+  color: var(--color-terminal-bg);
+}
+
+/* Blinking cursor animation */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Scanline effect */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #1a1b26;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #24283b;
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #24283b #1a1b26;
+}
+
+/* Glow effect for the terminal window */
+.terminal-glow {
+  box-shadow:
+    0 0 30px rgba(36, 36, 62, 0.6),
+    0 0 60px rgba(165, 148, 249, 0.08),
+    0 4px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Dotted border utility */
+.border-dotted-custom {
+  border-style: dotted;
+}
+
+/* Screen shake for Retro theme */
+@keyframes shake {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+
+  40% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+
+  50% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg);
+  }
+
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg);
+  }
+
+  90% {
+    transform: translate(1px, 2px) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg);
+  }
+}
+
+.shake {
+  animation: shake 0.5s;
+  animation-iteration-count: 1;
+}
