@@ -2,12 +2,15 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FLAT_COMMANDS } from "@/lib/constants";
+import { useTerminalAudio } from "@/hooks/useTerminalAudio";
 
 type CommandInputProps = {
   onExecute: (command: string) => void;
+  audioEnabled?: boolean;
 };
 
-export default function CommandInput({ onExecute }: CommandInputProps) {
+export default function CommandInput({ onExecute, audioEnabled }: CommandInputProps) {
+  const { playSound } = useTerminalAudio();
   const [value, setValue] = useState("");
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -63,6 +66,10 @@ export default function CommandInput({ onExecute }: CommandInputProps) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (audioEnabled) {
+        playSound(e.key === 'Enter' ? 'enter' : 'keypress');
+      }
+
       if (e.key === "Tab") {
         e.preventDefault(); // always prevent default tab behavior in terminal input
 

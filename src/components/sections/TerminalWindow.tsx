@@ -317,10 +317,30 @@ export default function TerminalWindow() {
     { id: 'init', command: '', view: 'home' }
   ]);
   const [activeTheme, setActiveTheme] = useState<string>("dark");
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [isMatrixMode, setIsMatrixMode] = useState(false);
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [commits, setCommits] = useState<GithubCommit[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleAudioToggle = useCallback(() => {
+    setAudioEnabled(prev => {
+      const next = !prev;
+      setHistory(h => [...h, { id: Date.now().toString(), command: '', view: `audio_${next ? 'enabled' : 'disabled'}` }]);
+      return next;
+    });
+  }, []);
+
+  const handleThemeCycle = useCallback(() => {
+    const themes = ["dark", "glass", "cyberpunk", "monochrome"];
+    setActiveTheme(prev => {
+      const nextIndex = (themes.indexOf(prev) + 1) % themes.length;
+      const nextTheme = themes[nextIndex];
+      document.body.className = `theme-${nextTheme}`;
+      setHistory(h => [...h, { id: Date.now().toString(), command: '', view: `theme_success_${nextTheme}` }]);
+      return nextTheme;
+    });
+  }, []);
 
   const [shakeClass, setShakeClass] = useState("");
   const [isDestructing, setIsDestructing] = useState(false);
@@ -512,6 +532,9 @@ export default function TerminalWindow() {
       const themeName = view.split("theme_success_")[1];
       return <div className="py-2 text-[var(--color-terminal-green)] italic">Theme successfully changed to {themeName}.</div>;
     }
+
+    if (view === "audio_enabled") return <div className="py-2 text-[var(--color-terminal-green)] italic">[SYSTEM] Mechanical audio feedback ENABLED.</div>;
+    if (view === "audio_disabled") return <div className="py-2 text-[var(--color-terminal-red)] italic">[SYSTEM] Mechanical audio feedback DISABLED.</div>;
 
     if (view.startsWith("name_success_")) {
       const name = view.split("name_success_")[1];
@@ -710,9 +733,9 @@ export default function TerminalWindow() {
             <div className="space-y-2">
               {[
                 { cmd: "/dark", name: "Default", desc: "deep tones", colors: ["#0D0D12", "#E0E0E6", "#D97757", "#9D8DF1"] },
-                { cmd: "/light", name: "Clean", desc: "bright mode", colors: ["#f0f0f5", "#1e1e2e", "#d25f3b", "#5b4db8"] },
-                { cmd: "/retro", name: "1983 CRT", desc: "scanlines", colors: ["#051405", "#33ff33", "#33ff33", "#33ff33"] },
-                { cmd: "/glass", name: "Frosted", desc: "with depth", colors: ["#1a1a24", "#ffffff", "#d97757", "#9d8df1"] }
+                { cmd: "/glass", name: "Frosted", desc: "with depth", colors: ["#1a1a24", "#ffffff", "#d97757", "#9d8df1"] },
+                { cmd: "/cyberpunk", name: "Neon", desc: "high contrast", colors: ["#0D0221", "#00F0FF", "#FF003C", "#00FF41"] },
+                { cmd: "/monochrome", name: "Pure", desc: "black & white", colors: ["#000000", "#ffffff", "#ffffff", "#ffffff"] }
               ].map((theme) => {
                 const isActive = activeTheme === theme.cmd.substring(1);
                 return (
@@ -752,7 +775,7 @@ export default function TerminalWindow() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className={`w-full z-10 px-4 md:px-0 transition-all duration-1000 ${shakeClass}`}
       >
-        <WindowFrame>
+        <WindowFrame onYellowClick={handleThemeCycle} onGreenClick={handleAudioToggle}>
           {isDestructing && destructCount === 0 && (
             <div className="absolute inset-0 z-50 flex flex-col justify-center items-center rounded-lg bg-black/50 backdrop-blur-md">
               <div className="text-[var(--color-terminal-red)] font-mono text-xl animate-pulse mb-8">SYSTEM CORRUPTED</div>
@@ -782,7 +805,7 @@ export default function TerminalWindow() {
             </div>
 
             <div className="border-t border-dotted border-[var(--color-terminal-border)] pt-4 mt-auto shrink-0 transition-all flex flex-col gap-4">
-              <CommandInput onExecute={handleCommand} />
+              <CommandInput onExecute={handleCommand} audioEnabled={audioEnabled} />
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono opacity-80 pt-2 border-t border-[var(--color-terminal-border)]/30">
                 <span className="text-[10px] uppercase opacity-40 hidden sm:block font-bold tracking-widest">Quick Nav:</span>
                 <button onClick={() => handleCommand("/about")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/about</button>
