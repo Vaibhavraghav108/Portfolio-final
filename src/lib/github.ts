@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const GITHUB_USERNAME = "Vaibhavraghav108";
 const CACHE_KEY_REPOS = "github_repos_cache_v3";
 const CACHE_KEY_EVENTS = "github_events_cache_v2";
@@ -61,9 +62,9 @@ export const fetchGithubRepos = async (): Promise<GithubRepo[]> => {
     const ignoreList = ["Vaibhavraghav108", "neetcode-submissions-ebebukbt"];
     
     const repos = data
-      .filter((repo: any) => !ignoreList.includes(repo.name) && !repo.fork)
+      .filter((repo: Record<string, any>) => !ignoreList.includes(repo.name) && !repo.fork)
       .slice(0, 10) // Show top 10 important ones
-      .map((repo: any) => ({
+      .map((repo: Record<string, any>) => ({
         name: repo.name,
         description: repo.description,
         html_url: repo.html_url,
@@ -106,7 +107,7 @@ export const fetchGithubCommits = async (): Promise<GithubCommit[]> => {
     
     if (!Array.isArray(data)) return [];
 
-    const commits = data.map((item: any) => ({
+    const commits = data.map((item: Record<string, any>) => ({
       sha: item.sha.substring(0, 7),
       message: item.commit.message,
       date: item.commit.author.date,

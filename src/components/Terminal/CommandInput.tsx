@@ -20,9 +20,9 @@ export default function CommandInput({ onExecute }: CommandInputProps) {
   useEffect(() => {
     if (value) {
       const searchTerm = value.toLowerCase();
-      let matches = FLAT_COMMANDS.filter(c => c.allTriggers.some(t => t.startsWith(searchTerm)));
+      let matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith(searchTerm)));
       if (matches.length === 0 && !searchTerm.startsWith("/")) {
-        matches = FLAT_COMMANDS.filter(c => c.allTriggers.some(t => t.startsWith("/" + searchTerm)));
+        matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith("/" + searchTerm)));
       }
       setSuggestions(matches);
       setSuggestionIndex(0);

@@ -269,6 +269,7 @@ export const COMMAND_DATABASE = {
     { cmd: "/experience", label: "Timeline", desc: "Professional work history" },
     { cmd: "/education", label: "Training", desc: "Academic background & certifications" },
     { cmd: "/contact", label: "Ping", desc: "Connectivity options" },
+    { cmd: "/hire", label: "Recruit", desc: "Send an email to Vaibhav", aliases: ["sudo hire vaibhav"] },
     { cmd: "/home", label: "Root", desc: "Return to home sequence" },
   ],
   Themes: [
@@ -293,9 +294,14 @@ export const FLAT_COMMANDS = [
   ...Object.values(COMMAND_DATABASE).flat(),
   ...SECRET_COMMANDS,
   { cmd: "git log", desc: "View live GitHub activity" },
-].map(c => ({
+].map((c: { cmd: string; desc?: string; label?: string; aliases?: string[] }) => ({
   ...c,
-  allTriggers: [c.cmd, c.cmd.replace("/", "")]
+  allTriggers: [
+    c.cmd, 
+    c.cmd.replace("/", ""), 
+    ...(c.aliases || []), 
+    ...(c.aliases?.map((a: string) => a.replace("/", "")) || [])
+  ]
 }));
 
 export const NAV_COMMANDS = COMMAND_DATABASE.Navigation;

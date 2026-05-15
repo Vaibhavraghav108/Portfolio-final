@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,10 +39,16 @@ const scrollToBottom = () => {
 
 const HireCommand = () => {
   const [step, setStep] = useState(0);
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [formStep, setFormStep] = useState<'email' | 'message' | 'sending' | 'success' | 'error'>('email');
+  
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     scrollToBottom();
-  }, [step]);
+  }, [step, formStep]);
 
   useEffect(() => {
     const s1 = setTimeout(() => setStep(1), 800);
@@ -56,12 +63,58 @@ const HireCommand = () => {
           colors: ['#D97757', '#9D8DF1', '#9ece6a']
         });
       });
+
+      setTimeout(() => {
+        setStep(4);
+      }, 1500);
     }, 2800);
     return () => { clearTimeout(s1); clearTimeout(s2); clearTimeout(s3); };
   }, []);
 
+  useEffect(() => {
+    if (step === 4 && formStep === 'email') {
+      emailInputRef.current?.focus();
+    } else if (formStep === 'message') {
+      messageInputRef.current?.focus();
+    }
+  }, [step, formStep]);
+
+  const handleEmailSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (email.trim() && email.includes('@') && email.includes('.')) {
+        setFormStep('message');
+      } else {
+        // Simple visual error feedback could go here
+      }
+    }
+  };
+
+  const handleMessageSubmit = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (message.trim()) {
+        setFormStep('sending');
+        try {
+          const res = await fetch('/api/hire', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recruiterEmail: email, message })
+          });
+          if (res.ok) {
+            setFormStep('success');
+          } else {
+            setFormStep('error');
+          }
+        } catch (error) {
+          setFormStep('error');
+        }
+      }
+    }
+  };
+
   return (
-    <div className="py-2 text-xs font-mono space-y-1 text-[var(--color-terminal-text)]">
+    <div className="py-2 text-xs font-mono space-y-1 text-[var(--color-terminal-text)] w-full">
       <p>Searching for talent... {step >= 1 ? <span className="text-[var(--color-terminal-green)]">[OK]</span> : ''}</p>
       {step >= 1 && <p>Analyzing neural patterns... {step >= 2 ? <span className="text-[var(--color-terminal-green)]">[OK]</span> : ''}</p>}
       {step >= 2 && (
@@ -72,7 +125,67 @@ const HireCommand = () => {
           </span>
         </p>
       )}
-      {step >= 3 && <p className="text-[var(--color-terminal-green)] font-bold mt-2">Welcome to the future of AI engineering.</p>}
+      {step >= 3 && (
+        <div className="mt-2 mb-4">
+          <p className="text-[var(--color-terminal-green)] font-bold">Welcome to the future of AI engineering.</p>
+        </div>
+      )}
+      
+      {step >= 4 && (
+        <div className="mt-4 border border-[var(--color-terminal-border)] p-4 rounded bg-black/20 w-full max-w-2xl space-y-4">
+          <p className="text-[var(--color-terminal-peach)] font-bold uppercase tracking-widest text-[10px] mb-2">Secure Channel Established</p>
+          
+          <div className="flex flex-col space-y-1">
+             <div className="flex items-center">
+               <span className="text-[var(--color-terminal-purple)] mr-2 w-32 shrink-0">Recruiter_Email:</span>
+               {formStep === 'email' ? (
+                 <input 
+                   ref={emailInputRef}
+                   type="email" 
+                   value={email}
+                   onChange={e => setEmail(e.target.value)}
+                   onKeyDown={handleEmailSubmit}
+                   placeholder="Enter email and press Enter..."
+                   className="bg-transparent border-none outline-none flex-1 text-[var(--color-terminal-text)] caret-[var(--color-terminal-peach)] placeholder-[#606060] italic"
+                 />
+               ) : (
+                 <span className="text-[var(--color-terminal-green)]">{email}</span>
+               )}
+             </div>
+          </div>
+
+          {(formStep === 'message' || formStep === 'sending' || formStep === 'success' || formStep === 'error') && (
+            <div className="flex flex-col space-y-1 pt-2">
+               <span className="text-[var(--color-terminal-purple)] mb-1">Message:</span>
+               {formStep === 'message' ? (
+                 <textarea 
+                   ref={messageInputRef}
+                   value={message}
+                   onChange={e => setMessage(e.target.value)}
+                   onKeyDown={handleMessageSubmit}
+                   placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
+                   rows={3}
+                   className="bg-transparent border border-[var(--color-terminal-border)] rounded p-2 outline-none w-full text-[var(--color-terminal-text)] caret-[var(--color-terminal-peach)] placeholder-[#606060] italic resize-none custom-scrollbar"
+                 />
+               ) : (
+                 <div className="text-[var(--color-terminal-text)] border border-[var(--color-terminal-border)]/50 p-2 rounded whitespace-pre-wrap opacity-70">
+                   {message}
+                 </div>
+               )}
+            </div>
+          )}
+
+          {formStep === 'sending' && (
+             <p className="text-[var(--color-terminal-peach)] animate-pulse pt-2">Transmitting data packets to vaibhavraghav108@gmail.com...</p>
+          )}
+          {formStep === 'success' && (
+             <p className="text-[var(--color-terminal-green)] font-bold pt-2">Message sent successfully. I will get back to you shortly.</p>
+          )}
+          {formStep === 'error' && (
+             <p className="text-[var(--color-terminal-red)] font-bold pt-2">Transmission failed. Please try again or use the /contact command.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -434,7 +547,7 @@ export default function TerminalWindow() {
       );
     }
 
-    if (view === "sudo hire vaibhav") {
+    if (view === "hire" || view === "sudo hire vaibhav") {
       return <HireCommand />;
     }
 
@@ -473,54 +586,54 @@ export default function TerminalWindow() {
         return <WorkCommand repos={repos} />;
       case "about":
         return (
-          <div className="text-xs space-y-4 opacity-90 py-4 font-mono max-w-xl leading-relaxed">
-            <h2 className="text-[var(--color-terminal-peach)] font-bold text-lg mb-4">About {IDENTITY.name}</h2>
-            <p>{ABOUT.summary}</p>
-            <div className="mt-6 pt-4 border-t border-dotted border-[var(--color-terminal-border)]">
-              <h3 className="text-[var(--color-terminal-purple)] font-bold mb-2 uppercase text-[10px]">Certifications</h3>
-              <ul className="space-y-1 opacity-70 italic">
-                {CERTIFICATIONS.map((cert, i) => <li key={i}>— {cert}</li>)}
-              </ul>
-            </div>
+          <div className="text-sm space-y-8 opacity-90 py-4 font-mono max-w-4xl leading-relaxed text-[var(--color-terminal-text)]">
+            {ABOUT.map((section: any, idx: number) => (
+              <div key={idx} className="space-y-4">
+                <h2 className="text-[var(--color-terminal-peach)] font-bold text-base">{section.title}</h2>
+                <div className="space-y-3">
+                  {section.paragraphs.map((p: string, pIdx: number) => (
+                    <p key={pIdx} className="opacity-90">{p}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         );
       case "education":
         return (
-          <div className="py-4 space-y-6">
-            <h2 className="text-[var(--color-terminal-peach)] font-bold text-lg mb-2">Academic History</h2>
-            {EDUCATION.map((edu, i) => (
-              <div key={i} className="font-mono text-xs border-l-2 border-[var(--color-terminal-blue)] pl-4">
-                <p className="text-[var(--color-terminal-blue)] font-bold text-sm">{edu.institution}</p>
-                <p className="opacity-80 mt-1">{edu.degree}</p>
-                <p className="opacity-60">{edu.location} • {edu.duration}</p>
-                <p className="mt-2 text-[var(--color-terminal-green)]">{edu.details}</p>
-              </div>
-            ))}
+          <div className="text-sm space-y-8 opacity-90 py-4 font-mono max-w-4xl leading-relaxed text-[var(--color-terminal-text)]">
+            <h2 className="text-[var(--color-terminal-peach)] font-bold text-base">Academic History</h2>
+            <div className="space-y-6">
+              {EDUCATION.map((edu, i) => (
+                <div key={i} className="space-y-1">
+                  <p className="text-white font-bold">{edu.institution}</p>
+                  <p className="opacity-90">{edu.degree}</p>
+                  <p className="opacity-50 text-xs pt-1">{edu.duration} • {edu.location}</p>
+                </div>
+              ))}
+            </div>
           </div>
         );
       case "experience":
         return (
-          <div className="py-4 space-y-8">
-            <h2 className="text-[var(--color-terminal-peach)] font-bold text-lg mb-2">Professional Experience</h2>
-            {EXPERIENCE.map((exp, i) => (
-              <div key={i} className="font-mono text-xs border-l-2 border-[var(--color-terminal-purple)] pl-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[var(--color-terminal-purple)] font-bold text-sm">{exp.role}</p>
-                    <p className="opacity-80">{exp.company} • {exp.type}</p>
+          <div className="text-sm space-y-8 opacity-90 py-4 font-mono max-w-4xl leading-relaxed text-[var(--color-terminal-text)]">
+            <h2 className="text-[var(--color-terminal-peach)] font-bold text-base">Professional Experience</h2>
+            <div className="space-y-8">
+              {EXPERIENCE.map((exp, i) => (
+                <div key={i} className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline">
+                    <p className="text-white font-bold">{exp.role}</p>
+                    <span className="opacity-50 text-xs mt-1 sm:mt-0">{exp.duration}</span>
                   </div>
-                  <span className="opacity-40 italic">{exp.duration}</span>
+                  <p className="opacity-90">{exp.company} • {exp.type}</p>
+                  <div className="space-y-3 pt-2">
+                    {exp.highlights.map((h, j) => (
+                      <p key={j} className="opacity-80">{h}</p>
+                    ))}
+                  </div>
                 </div>
-                <ul className="mt-3 space-y-2 opacity-70">
-                  {exp.highlights.map((h, j) => (
-                    <li key={j} className="flex gap-2">
-                      <span className="text-[var(--color-terminal-peach)]">›</span>
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         );
       case "contact":
@@ -554,11 +667,14 @@ export default function TerminalWindow() {
                 </a>
               ))}
             </div>
+            <p className="mt-8 text-xs text-[#606060] italic">
+              Use <span className="text-[var(--color-terminal-peach)] font-bold">/hire</span> to transmit an encrypted message directly.
+            </p>
           </div>
         );
       case "help":
       case "secrets":
-        const cmds = view === "secrets" ? { Secrets: FLAT_COMMANDS.filter(c => c.cmd.match(/^\/matrix$|^\/destruct$|^sudo hire vaibhav$|^ping vaibhav$|git log$/)) } : COMMAND_DATABASE;
+        const cmds = view === "secrets" ? { Secrets: FLAT_COMMANDS.filter(c => c.cmd.match(/^\/matrix$|^\/destruct$|^ping vaibhav$|git log$/)) } : COMMAND_DATABASE;
         return (
           <div className="py-4 font-mono w-full">
             <div className="space-y-6">

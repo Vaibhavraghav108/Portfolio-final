@@ -21,7 +21,7 @@ export default function SkillBars() {
 
   return (
     <div className="my-2">
-      <h2 className="text-sm font-bold text-[var(--color-terminal-peach)] uppercase tracking-widest mb-4">
+      <h2 className="text-base font-bold text-[var(--color-terminal-peach)] mb-6">
         Expertise & Capabilities
       </h2>
       <div className="space-y-2.5 text-xs font-mono">
@@ -51,11 +51,11 @@ export default function SkillBars() {
         ))}
       </div>
 
-      <div className="mt-8 pt-4 border-t border-dotted border-[var(--color-terminal-border)]">
-        <h3 className="text-sm font-bold text-[var(--color-terminal-peach)] mb-3">
+      <div className="mt-10">
+        <h3 className="text-base font-bold text-[var(--color-terminal-peach)] mb-4">
           Tools
         </h3>
-        <p className="text-xs leading-relaxed opacity-80 font-mono">
+        <p className="text-sm leading-relaxed opacity-90 font-mono">
           Python • LangChain • OpenAI • Ollama • FAISS
           <br />
           TensorFlow • PyTorch • Scikit-learn • MLOps

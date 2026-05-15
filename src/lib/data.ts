@@ -5,9 +5,28 @@ export const IDENTITY = {
   github: "Vaibhavraghav108",
 };
 
-export const ABOUT = {
-  summary: "Aspiring AI Engineer and B.Tech CSE student at Manipal Institute of Technology specializing in Generative AI, Computer Vision, and Predictive Modeling. Proven expertise in developing RAG systems, high-accuracy ML models (80%+ accuracy), and end-to-end data pipelines. Proficient in Python, LangChain, and MLOps tools, with a focus on building scalable, production-ready AI solutions that solve complex real-world challenges.",
-};
+export const ABOUT = [
+  {
+    title: `About ${IDENTITY.name}`,
+    paragraphs: [
+      "Aspiring AI Engineer and B.Tech CSE student at Manipal Institute of Technology. Passionate about pushing the boundaries of machine intelligence and building systems that solve complex, real-world problems."
+    ]
+  },
+  {
+    title: "What I do",
+    paragraphs: [
+      "I specialize in Generative AI, Computer Vision, and Predictive Modeling. My focus is on translating complex data into actionable insights and robust AI systems.",
+      "From developing sophisticated RAG systems to engineering high-accuracy machine learning models, my work sits at the intersection of data science, backend engineering, and MLOps."
+    ]
+  },
+  {
+    title: "Current trajectory",
+    paragraphs: [
+      "Currently pursuing my B.Tech in Computer Science and Engineering with a specialization in Artificial Intelligence at MIT Bengaluru.",
+      "I am actively building scalable, production-ready AI solutions using Python, LangChain, and PyTorch, while constantly exploring the latest advancements in LLMs and agentic frameworks."
+    ]
+  }
+];
 
 export const SKILLS = {
   "Programming Languages": [
@@ -47,7 +66,6 @@ export const EDUCATION = [
     location: "Bengaluru, India",
     degree: "B.Tech. CSE (Artificial Intelligence)",
     duration: "Jul 2027",
-    details: "CGPA: 7.96/10",
   },
 ];
 
