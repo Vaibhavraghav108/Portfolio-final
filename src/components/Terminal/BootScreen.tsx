@@ -198,7 +198,10 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96, filter: "blur(8px)" }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-[850px] h-[650px] max-h-[85vh] flex flex-col mx-auto rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative"
+          className="w-full max-w-[1000px] h-[800px] max-h-[90vh] flex flex-col mx-auto rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative cursor-pointer sm:cursor-default"
+          onClick={() => {
+            if (currentStep >= SEQUENCE.length - 1) triggerExit();
+          }}
         >
           {/* Scanlines */}
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.06)_50%)] bg-[length:100%_4px] opacity-[0.05] z-30" />
@@ -206,9 +209,7 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           {/* Title bar */}
           <div className="bg-black/20 p-3 flex items-center justify-between border-b border-[var(--color-terminal-border)] relative z-40 shrink-0">
             <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-              <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-              <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+              <button onClick={(e) => { e.stopPropagation(); window.location.href = 'about:blank'; }} className="w-3 h-3 rounded-full bg-[#ff5f56] hover:opacity-80 transition-opacity cursor-pointer" aria-label="Close" />
             </div>
             <div className="text-xs text-[#606060]">vaibhav@raghav ~ /boot</div>
             <div className="w-12" />
@@ -238,11 +239,12 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
                         transition={{ duration: 0.4 }}
                         className="mt-6 flex items-center gap-2 text-[var(--color-terminal-peach)] font-semibold"
                       >
-                        Press{" "}
-                        <kbd className="px-1.5 py-0.5 rounded border border-[var(--color-terminal-peach)]/50 text-[11px] text-[var(--color-terminal-peach)] bg-[var(--color-terminal-peach)]/10">
+                        <span className="hidden sm:inline">Press{" "}</span>
+                        <kbd className="px-1.5 py-0.5 rounded border border-[var(--color-terminal-peach)]/50 text-[11px] text-[var(--color-terminal-peach)] bg-[var(--color-terminal-peach)]/10 hidden sm:inline-block">
                           Enter
                         </kbd>{" "}
-                        to continue
+                        <span className="sm:hidden">Tap anywhere</span>
+                        <span className="hidden sm:inline">to continue</span>
                         <motion.span
                           animate={{ opacity: [1, 0] }}
                           transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
@@ -291,7 +293,7 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           initial={{ opacity: 1 }}
           animate={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="w-full max-w-[850px] h-[650px] max-h-[85vh] rounded-lg bg-[var(--color-terminal-bg)] border border-[var(--color-terminal-border)]"
+          className="w-full max-w-[1000px] h-[800px] max-h-[90vh] rounded-lg bg-[var(--color-terminal-bg)] border border-[var(--color-terminal-border)]"
         />
       )}
     </AnimatePresence>

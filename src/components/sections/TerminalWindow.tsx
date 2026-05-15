@@ -781,8 +781,17 @@ export default function TerminalWindow() {
               </div>
             </div>
 
-            <div className="border-t border-dotted border-[var(--color-terminal-border)] pt-4 mt-auto shrink-0 transition-all">
+            <div className="border-t border-dotted border-[var(--color-terminal-border)] pt-4 mt-auto shrink-0 transition-all flex flex-col gap-4">
               <CommandInput onExecute={handleCommand} />
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono opacity-80 pt-2 border-t border-[var(--color-terminal-border)]/30">
+                <span className="text-[10px] uppercase opacity-40 hidden sm:block font-bold tracking-widest">Quick Nav:</span>
+                <button onClick={() => handleCommand("/about")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/about</button>
+                <button onClick={() => handleCommand("/experience")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/experience</button>
+                <button onClick={() => handleCommand("/skills")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/skills</button>
+                <button onClick={() => handleCommand("/work")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/work</button>
+                <button onClick={() => handleCommand("/contact")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/contact</button>
+                <button onClick={() => handleCommand("/hire")} className="sm:ml-auto text-[var(--color-terminal-purple)] font-bold hover:text-[var(--color-terminal-peach)] transition-colors">/hire</button>
+              </div>
             </div>
           </div>
         </WindowFrame>

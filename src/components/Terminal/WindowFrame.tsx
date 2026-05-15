@@ -7,9 +7,7 @@ export const WindowFrame = ({ children }: { children: React.ReactNode }) => (
 
     <div className="bg-black/20 p-3 flex items-center justify-between border-b border-[var(--color-terminal-border)] relative z-40 shrink-0">
       <div className="flex gap-2">
-        <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-        <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-        <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+        <button onClick={() => window.location.href = 'about:blank'} className="w-3 h-3 rounded-full bg-[#ff5f56] hover:opacity-80 transition-opacity cursor-pointer" aria-label="Close" />
       </div>
       <div className="text-xs text-[#606060]">vaibhav@raghav ~ /portfolio</div>
       <div className="w-12"></div> {/* Spacer */}
