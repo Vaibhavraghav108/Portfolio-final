@@ -27,7 +27,7 @@ export default function SkillBars() {
       <div className="space-y-2.5 text-xs font-mono">
         {allSkills.map((skill, i) => (
           <div key={i} className="flex items-center gap-3">
-            <span className="w-44 shrink-0 text-[var(--color-terminal-text)] opacity-80">
+            <span className="w-28 sm:w-36 md:w-44 shrink-0 text-[var(--color-terminal-text)] opacity-80 truncate">
               {skill.name}
             </span>
             <div className="flex-grow h-[3px] bg-[var(--color-terminal-border)]/50 relative overflow-hidden rounded-full">

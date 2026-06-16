@@ -21,7 +21,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${jetbrainsMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-mono">{children}</body>
+      <body className="min-h-full flex flex-col font-mono">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('terminal_theme') || 'dark';
+                if (t !== 'dark') document.body.classList.add('theme-' + t);
+              } catch(e) {}
+            `,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

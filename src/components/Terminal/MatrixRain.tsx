@@ -39,11 +39,15 @@ export function MatrixRain() {
 
     animationFrameId = requestAnimationFrame(matrix);
 
+    let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, w, h);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, w, h);
+      }, 100);
     };
 
     window.addEventListener("resize", handleResize);

@@ -1,7 +1,7 @@
 import React from "react";
 
 export const WindowFrame = ({ children, onYellowClick, onGreenClick }: { children: React.ReactNode, onYellowClick?: () => void, onGreenClick?: () => void }) => (
-  <div id="terminal-window" className="w-full max-w-[1000px] h-[800px] max-h-[90vh] flex flex-col mx-auto mt-0 rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative transition-colors duration-500">
+  <div id="terminal-window" className="w-full max-w-[1000px] h-[88vh] md:h-[800px] max-h-[95vh] flex flex-col mx-auto mt-0 rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative transition-colors duration-500">
     {/* Subtle scanline overlay */}
     <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.08)_50%)] bg-[length:100%_4px] opacity-[0.04] z-30" />
 
@@ -15,7 +15,7 @@ export const WindowFrame = ({ children, onYellowClick, onGreenClick }: { childre
       <div className="w-12"></div> {/* Spacer */}
     </div>
 
-    <div className="p-6 md:p-8 relative z-20 flex-1 flex flex-col min-h-0">
+    <div className="p-4 sm:p-6 md:p-8 relative z-20 flex-1 flex flex-col min-h-0">
       {children}
     </div>
   </div>

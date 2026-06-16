@@ -69,7 +69,6 @@ body {
   color: var(--foreground);
   font-family: var(--font-mono);
   overflow-x: hidden;
-  /* Hide scrollbar for IE, Edge and Firefox */
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

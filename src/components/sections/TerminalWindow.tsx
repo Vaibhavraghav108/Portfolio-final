@@ -4,22 +4,20 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Lenis from "lenis";
-import { Mail, Phone, ExternalLink, Globe, MapPin, Code, Briefcase, GitBranch } from "lucide-react";
+import { Mail, Phone, ExternalLink, Code, Briefcase } from "lucide-react";
 import { WindowFrame } from "@/components/Terminal/WindowFrame";
 import { AsciiHeader } from "@/components/Terminal/AsciiHeader";
 import { TerminalSection } from "@/components/Terminal/TerminalSection";
 import CommandInput from "@/components/Terminal/CommandInput";
 import SkillBars from "@/components/Terminal/SkillBars";
 import ProjectCards from "@/components/Terminal/ProjectCards";
-import ClientGrid from "@/components/Terminal/ClientGrid";
 import { COMMAND_DATABASE, FLAT_COMMANDS } from "@/lib/constants";
 import {
   IDENTITY,
   ABOUT,
   EDUCATION,
   EXPERIENCE,
-  CONTACT,
-  CERTIFICATIONS
+  CONTACT
 } from "@/lib/data";
 import { fetchGithubRepos, fetchGithubCommits, GithubRepo, GithubCommit } from "@/lib/github";
 import { MatrixRain } from "@/components/Terminal/MatrixRain";
@@ -42,6 +40,7 @@ const HireCommand = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [formStep, setFormStep] = useState<'email' | 'message' | 'sending' | 'success' | 'error'>('email');
+  const [errorMsg, setErrorMsg] = useState("");
   
   const emailInputRef = useRef<HTMLInputElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
@@ -104,9 +103,12 @@ const HireCommand = () => {
           if (res.ok) {
             setFormStep('success');
           } else {
+            const data = await res.json().catch(() => ({ error: 'Unknown error' }));
+            setErrorMsg(data.error || 'Transmission failed');
             setFormStep('error');
           }
-        } catch (error) {
+        } catch {
+          setErrorMsg('Network error. Check your connection.');
           setFormStep('error');
         }
       }
@@ -132,27 +134,27 @@ const HireCommand = () => {
       )}
       
       {step >= 4 && (
-        <div className="mt-4 border border-[var(--color-terminal-border)] p-4 rounded bg-black/20 w-full max-w-2xl space-y-4">
+        <div className="mt-4 border border-[var(--color-terminal-border)] p-3 sm:p-4 rounded bg-black/20 w-full max-w-xl space-y-4">
           <p className="text-[var(--color-terminal-peach)] font-bold uppercase tracking-widest text-[10px] mb-2">Secure Channel Established</p>
           
-          <div className="flex flex-col space-y-1">
-             <div className="flex items-center">
-               <span className="text-[var(--color-terminal-purple)] mr-2 w-32 shrink-0">Recruiter_Email:</span>
-               {formStep === 'email' ? (
-                 <input 
-                   ref={emailInputRef}
-                   type="email" 
-                   value={email}
-                   onChange={e => setEmail(e.target.value)}
-                   onKeyDown={handleEmailSubmit}
-                   placeholder="Enter email and press Enter..."
-                   className="bg-transparent border-none outline-none flex-1 text-[var(--color-terminal-text)] caret-[var(--color-terminal-peach)] placeholder-[#606060] italic"
-                 />
-               ) : (
-                 <span className="text-[var(--color-terminal-green)]">{email}</span>
-               )}
-             </div>
-          </div>
+              <div className="flex flex-col space-y-1">
+                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
+                <span className="text-[var(--color-terminal-purple)] sm:mr-2 w-full sm:w-32 shrink-0 text-[11px] sm:text-xs">Recruiter_Email:</span>
+                {formStep === 'email' ? (
+                  <input 
+                    ref={emailInputRef}
+                    type="email" 
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    onKeyDown={handleEmailSubmit}
+                    placeholder="Enter email and press Enter..."
+                    className="bg-transparent border border-[var(--color-terminal-border)] sm:border-none rounded sm:rounded-none px-2 sm:px-0 py-1.5 sm:py-0 outline-none w-full text-[var(--color-terminal-text)] caret-[var(--color-terminal-peach)] placeholder-[#606060] italic text-[11px] sm:text-xs"
+                  />
+                ) : (
+                  <span className="text-[var(--color-terminal-green)] break-all">{email}</span>
+                )}
+              </div>
+              </div>
 
           {(formStep === 'message' || formStep === 'sending' || formStep === 'success' || formStep === 'error') && (
             <div className="flex flex-col space-y-1 pt-2">
@@ -182,7 +184,7 @@ const HireCommand = () => {
              <p className="text-[var(--color-terminal-green)] font-bold pt-2">Message sent successfully. I will get back to you shortly.</p>
           )}
           {formStep === 'error' && (
-             <p className="text-[var(--color-terminal-red)] font-bold pt-2">Transmission failed. Please try again or use the /contact command.</p>
+             <p className="text-[var(--color-terminal-red)] font-bold pt-2">{errorMsg}</p>
           )}
         </div>
       )}
@@ -192,6 +194,9 @@ const HireCommand = () => {
 
 const PingCommand = () => {
   const [lines, setLines] = useState<number>(0);
+  const [times] = useState<string[]>(() =>
+    Array.from({ length: 5 }, () => (0.2 + Math.random() * 0.5).toFixed(1))
+  );
 
   useEffect(() => {
     scrollToBottom();
@@ -213,7 +218,7 @@ const PingCommand = () => {
   return (
     <div className="py-2 text-xs font-mono text-[var(--color-terminal-text)] opacity-80">
       {Array.from({ length: lines + 1 }).map((_, i) => (
-        <p key={i}>64 bytes from {IDENTITY.name}: icmp_seq={i + 1} ttl=64 time={(0.2 + Math.random() * 0.5).toFixed(1)}ms — RAG Pipeline Active.</p>
+        <p key={i}>64 bytes from {IDENTITY.name}: icmp_seq={i + 1} ttl=64 time={times[i]}ms — RAG Pipeline Active.</p>
       ))}
     </div>
   );
@@ -322,6 +327,23 @@ export default function TerminalWindow() {
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [commits, setCommits] = useState<GithubCommit[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const themeInitialized = useRef(false);
+
+  const applyTheme = useCallback((theme: string) => {
+    const body = document.body;
+    body.classList.remove('theme-dark', 'theme-cyberpunk', 'theme-monochrome', 'theme-glass');
+    body.classList.add(`theme-${theme}`);
+    setActiveTheme(theme);
+    try { localStorage.setItem('terminal_theme', theme); } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (themeInitialized.current) return;
+    themeInitialized.current = true;
+    let saved = 'dark';
+    try { saved = localStorage.getItem('terminal_theme') || 'dark'; } catch {}
+    applyTheme(saved);
+  }, [applyTheme]);
 
   const handleAudioToggle = useCallback(() => {
     setAudioEnabled(prev => {
@@ -336,11 +358,11 @@ export default function TerminalWindow() {
     setActiveTheme(prev => {
       const nextIndex = (themes.indexOf(prev) + 1) % themes.length;
       const nextTheme = themes[nextIndex];
-      document.body.className = `theme-${nextTheme}`;
+      applyTheme(nextTheme);
       setHistory(h => [...h, { id: Date.now().toString(), command: '', view: `theme_success_${nextTheme}` }]);
       return nextTheme;
     });
-  }, []);
+  }, [applyTheme]);
 
   const [shakeClass, setShakeClass] = useState("");
   const [isDestructing, setIsDestructing] = useState(false);
@@ -398,13 +420,15 @@ export default function TerminalWindow() {
       touchMultiplier: 2,
     });
 
+    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);
@@ -418,12 +442,12 @@ export default function TerminalWindow() {
     return () => clearTimeout(timer);
   }, [isDestructing, destructCount]);
 
-  const triggerErrorShake = () => {
+  const triggerErrorShake = useCallback(() => {
     if (activeTheme === 'retro') {
       setShakeClass("shake");
       setTimeout(() => setShakeClass(""), 500);
     }
-  };
+  }, [activeTheme]);
 
   const handleCommand = useCallback((cmd: string) => {
     const rawInput = cmd.trim();
@@ -477,8 +501,7 @@ export default function TerminalWindow() {
 
       if (COMMAND_DATABASE.Themes?.some(t => t.cmd === canonicalCmd) && canonicalCmd !== "/themes") {
         const themeName = canonicalCmd.replace("/", "");
-        document.body.className = `theme-${themeName}`;
-        setActiveTheme(themeName);
+        applyTheme(themeName);
         setHistory(prev => [...prev, { id: Date.now().toString(), command: cmd, view: 'theme_success_' + themeName }]);
         return;
       }
@@ -514,7 +537,7 @@ export default function TerminalWindow() {
       triggerErrorShake();
       setHistory(prev => [...prev, { id: Date.now().toString(), command: cmd, view: "error_" + baseCommand }]);
     }
-  }, [activeTheme]);
+  }, [applyTheme, triggerErrorShake]);
 
   const renderContent = (view: string) => {
     if (view.startsWith("error_")) {
@@ -670,23 +693,23 @@ export default function TerminalWindow() {
         return (
           <div className="py-6 w-full">
             <h2 className="text-[var(--color-terminal-peach)] text-lg font-bold mb-6">Connectivity Hub</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl">
               {contactItems.map((item, i) => (
                 <a
                   key={i}
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-4 p-4 border border-dotted border-[var(--color-terminal-border)] rounded-lg hover:border-[var(--color-terminal-peach)]/50 hover:bg-[var(--color-terminal-peach)]/5 transition-all duration-300"
+                  className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 min-h-[60px] border border-dotted border-[var(--color-terminal-border)] rounded-lg hover:border-[var(--color-terminal-peach)]/50 hover:bg-[var(--color-terminal-peach)]/5 transition-all duration-300"
                 >
-                  <div className="text-[var(--color-terminal-purple)] group-hover:text-[var(--color-terminal-peach)] transition-colors">
+                  <div className="text-[var(--color-terminal-purple)] group-hover:text-[var(--color-terminal-peach)] transition-colors shrink-0">
                     {item.icon}
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0">
                     <span className="text-[10px] uppercase opacity-40 font-bold tracking-widest">{item.label}</span>
-                    <span className="text-xs font-mono opacity-80 group-hover:opacity-100 transition-opacity truncate max-w-[200px]">{item.value}</span>
+                    <span className="text-xs font-mono opacity-80 group-hover:opacity-100 transition-opacity truncate">{item.value}</span>
                   </div>
-                  <ExternalLink size={12} className="ml-auto opacity-0 group-hover:opacity-30 transition-opacity" />
+                  <ExternalLink size={12} className="ml-auto shrink-0 opacity-0 group-hover:opacity-30 transition-opacity" />
                 </a>
               ))}
             </div>
@@ -708,15 +731,15 @@ export default function TerminalWindow() {
                   </h2>
                   <div className="space-y-1 text-xs">
                     {(commands as any[]).map(c => (
-                      <p key={c.cmd} className="flex">
-                        <span className="w-40 shrink-0 text-[var(--color-terminal-peach)] font-bold cursor-pointer hover:underline" onClick={() => handleCommand(c.cmd)}>{c.cmd}</span>
-                        <span className="text-[#9090a0]">{c.desc}</span>
+                      <p key={c.cmd} className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-0">
+                        <span className="w-full sm:w-40 shrink-0 text-[var(--color-terminal-peach)] font-bold cursor-pointer hover:underline" onClick={() => handleCommand(c.cmd)}>{c.cmd}</span>
+                        <span className="text-[#9090a0] sm:pl-0">{c.desc}</span>
                       </p>
                     ))}
                     {category === "Navigation" && (
-                      <p className="flex">
-                        <span className="w-40 shrink-0 text-[var(--color-terminal-peach)] font-bold cursor-pointer hover:underline" onClick={() => handleCommand("git log")}>git log</span>
-                        <span className="text-[#9090a0]">View live GitHub activity</span>
+                      <p className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-0">
+                        <span className="w-full sm:w-40 shrink-0 text-[var(--color-terminal-peach)] font-bold cursor-pointer hover:underline" onClick={() => handleCommand("git log")}>git log</span>
+                        <span className="text-[#9090a0] sm:pl-0">View live GitHub activity</span>
                       </p>
                     )}
                   </div>
@@ -806,14 +829,14 @@ export default function TerminalWindow() {
 
             <div className="border-t border-dotted border-[var(--color-terminal-border)] pt-4 mt-auto shrink-0 transition-all flex flex-col gap-4">
               <CommandInput onExecute={handleCommand} audioEnabled={audioEnabled} />
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono opacity-80 pt-2 border-t border-[var(--color-terminal-border)]/30">
-                <span className="text-[10px] uppercase opacity-40 hidden sm:block font-bold tracking-widest">Quick Nav:</span>
-                <button onClick={() => handleCommand("/about")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/about</button>
-                <button onClick={() => handleCommand("/experience")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/experience</button>
-                <button onClick={() => handleCommand("/skills")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/skills</button>
-                <button onClick={() => handleCommand("/work")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/work</button>
-                <button onClick={() => handleCommand("/contact")} className="hover:text-[var(--color-terminal-peach)] transition-colors">/contact</button>
-                <button onClick={() => handleCommand("/hire")} className="sm:ml-auto text-[var(--color-terminal-purple)] font-bold hover:text-[var(--color-terminal-peach)] transition-colors">/hire</button>
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-4 text-xs font-mono opacity-80 pt-2 border-t border-[var(--color-terminal-border)]/30">
+                <span className="text-[10px] uppercase opacity-40 hidden sm:block font-bold tracking-widest mr-1">Quick Nav:</span>
+                <button onClick={() => handleCommand("/about")} className="px-2 py-1.5 min-h-[36px] hover:text-[var(--color-terminal-peach)] transition-colors">/about</button>
+                <button onClick={() => handleCommand("/experience")} className="px-2 py-1.5 min-h-[36px] hover:text-[var(--color-terminal-peach)] transition-colors">/experience</button>
+                <button onClick={() => handleCommand("/skills")} className="px-2 py-1.5 min-h-[36px] hover:text-[var(--color-terminal-peach)] transition-colors">/skills</button>
+                <button onClick={() => handleCommand("/work")} className="px-2 py-1.5 min-h-[36px] hover:text-[var(--color-terminal-peach)] transition-colors">/work</button>
+                <button onClick={() => handleCommand("/contact")} className="px-2 py-1.5 min-h-[36px] hover:text-[var(--color-terminal-peach)] transition-colors">/contact</button>
+                <button onClick={() => handleCommand("/hire")} className="px-2 py-1.5 min-h-[36px] sm:ml-auto text-[var(--color-terminal-purple)] font-bold hover:text-[var(--color-terminal-peach)] transition-colors">/hire</button>
               </div>
             </div>
           </div>

@@ -44,25 +44,29 @@ function TypewriterLine({
     if (!isActive) return;
 
     if (line.centered || speed === 0) {
-      setDisplayed(line.text);
       if (!doneRef.current) {
         doneRef.current = true;
-        setTimeout(onComplete, 80);
+        setTimeout(() => {
+          setDisplayed(line.text);
+          onComplete();
+        }, 80);
+      }
+      return;
     }
-    return;
-  }
 
-  if (displayed.length >= line.text.length) {
-    if (!doneRef.current) {
-      doneRef.current = true;
-      setTimeout(onComplete, 50);
+    if (displayed.length >= line.text.length) {
+      if (!doneRef.current) {
+        doneRef.current = true;
+        setTimeout(() => {
+          onComplete();
+        }, 50);
+      }
+      return;
     }
-    return;
-  }
 
-  const t = setTimeout(() => {
-    setDisplayed(line.text.slice(0, displayed.length + 1));
-  }, speed);
+    const t = setTimeout(() => {
+      setDisplayed(line.text.slice(0, displayed.length + 1));
+    }, speed);
 
     return () => clearTimeout(t);
   }, [isActive, displayed, line, speed, onComplete]);
@@ -198,7 +202,7 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96, filter: "blur(8px)" }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-[1000px] h-[800px] max-h-[90vh] flex flex-col mx-auto rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative cursor-pointer sm:cursor-default"
+          className="w-full max-w-[1000px] h-[88vh] md:h-[800px] max-h-[95vh] flex flex-col mx-auto rounded-lg overflow-hidden border border-[var(--color-terminal-border)] shadow-2xl bg-[var(--color-terminal-bg)] backdrop-blur-md font-mono terminal-glow relative cursor-pointer sm:cursor-default"
           onClick={() => {
             if (currentStep >= SEQUENCE.length - 1) triggerExit();
           }}
@@ -218,7 +222,7 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           </div>
 
           {/* Boot log */}
-          <div className="p-6 md:p-8 relative z-20 flex-1 flex flex-col min-h-0">
+          <div className="p-4 sm:p-6 md:p-8 relative z-20 flex-1 flex flex-col min-h-0">
             <div className="flex flex-col gap-[7px] text-[13px] font-mono">
               {SEQUENCE.slice(0, visibleCount).map((line, i) => {
                 const isActive = i === currentStep;
@@ -295,7 +299,7 @@ export default function BootScreen({ onComplete }: { onComplete: () => void }) {
           initial={{ opacity: 1 }}
           animate={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="w-full max-w-[1000px] h-[800px] max-h-[90vh] rounded-lg bg-[var(--color-terminal-bg)] border border-[var(--color-terminal-border)]"
+          className="w-full max-w-[1000px] h-[88vh] md:h-[800px] max-h-[95vh] rounded-lg bg-[var(--color-terminal-bg)] border border-[var(--color-terminal-border)]"
         />
       )}
     </AnimatePresence>

@@ -6,7 +6,7 @@ export function useTerminalAudio() {
   const initAudio = useCallback(() => {
     if (typeof window === 'undefined') return;
     if (!audioCtxRef.current) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         audioCtxRef.current = new AudioContextClass();
       }
@@ -48,7 +48,7 @@ export function useTerminalAudio() {
       
       osc.start(t);
       osc.stop(t + 0.1);
-    } catch (err) {
+    } catch {
       // Ignore audio generation errors
     }
   }, [initAudio]);

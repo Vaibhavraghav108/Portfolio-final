@@ -20,28 +20,23 @@ export default function CommandInput({ onExecute, audioEnabled }: CommandInputPr
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (value) {
-      const searchTerm = value.toLowerCase();
-      let matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith(searchTerm)));
-      if (matches.length === 0 && !searchTerm.startsWith("/")) {
-        matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith("/" + searchTerm)));
-      }
-      setSuggestions(matches);
-      setSuggestionIndex(0);
-    } else {
-      setSuggestions([]);
+  const computeSuggestions = useCallback((val: string) => {
+    if (!val) { setSuggestions([]); return; }
+    const searchTerm = val.toLowerCase();
+    let matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith(searchTerm)));
+    if (matches.length === 0 && !searchTerm.startsWith("/")) {
+      matches = FLAT_COMMANDS.filter(c => c.allTriggers.some((t: string) => t.startsWith("/" + searchTerm)));
     }
-  }, [value]);
+    setSuggestions(matches);
+    setSuggestionIndex(0);
+  }, []);
 
   useEffect(() => {
     if (suggestions.length > 0 && dropdownRef.current) {
-      const selectedEl = dropdownRef.current.children[suggestionIndex] as HTMLElement;
-      if (selectedEl) {
-        selectedEl.scrollIntoView({ block: "nearest" });
-      }
+      const el = dropdownRef.current.children[suggestionIndex] as HTMLElement;
+      if (el) el.scrollIntoView({ block: "nearest" });
     }
-  }, [suggestionIndex, suggestions.length]);
+  }, [suggestionIndex, suggestions]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -61,7 +56,7 @@ export default function CommandInput({ onExecute, audioEnabled }: CommandInputPr
         setValue("");
       }
     },
-    [value, suggestions, suggestionIndex, onExecute]
+    [value, suggestions, suggestionIndex, onExecute, setSuggestions]
   );
 
   const handleKeyDown = useCallback(
@@ -114,7 +109,7 @@ export default function CommandInput({ onExecute, audioEnabled }: CommandInputPr
         setSuggestions([]);
       }
     },
-    [suggestions, suggestionIndex, commandHistory, historyIndex, value]
+    [suggestions, suggestionIndex, commandHistory, historyIndex, audioEnabled, playSound, setSuggestions]
   );
 
   useEffect(() => {
@@ -153,8 +148,8 @@ export default function CommandInput({ onExecute, audioEnabled }: CommandInputPr
                 inputRef.current?.focus();
               }}
             >
-              <span className="w-36 shrink-0 text-[var(--color-terminal-peach)] font-bold">{cmd.cmd}</span>
-              <span className="opacity-70 truncate">{cmd.desc}</span>
+              <span className="w-20 sm:w-36 shrink-0 text-[var(--color-terminal-peach)] font-bold text-[11px] sm:text-xs">{cmd.cmd}</span>
+              <span className="opacity-70 truncate text-[11px] sm:text-xs">{cmd.desc}</span>
             </div>
           ))}
         </div>
@@ -172,6 +167,7 @@ export default function CommandInput({ onExecute, audioEnabled }: CommandInputPr
           onChange={(e) => {
             setValue(e.target.value);
             setHistoryIndex(-1);
+            computeSuggestions(e.target.value);
           }}
           onKeyDown={handleKeyDown}
           className="w-full bg-transparent outline-none border-none p-0 m-0 text-[var(--color-terminal-text)] selection:bg-[var(--color-terminal-peach)] selection:text-[var(--color-terminal-bg)] block font-mono caret-[var(--color-terminal-peach)] placeholder-[#606060] placeholder:italic relative z-10"

@@ -5,49 +5,44 @@ import { motion } from "framer-motion";
 
 export default function Cursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [hovered, setHovered] = useState(false);
+  const [, setHovered] = useState(false);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
 
+    document.addEventListener("mousemove", onMouseMove);
+
     const handleHoverStart = () => setHovered(true);
     const handleHoverEnd = () => setHovered(false);
 
-    document.addEventListener("mousemove", onMouseMove);
+    const tracked = new WeakSet<Element>();
 
-    // Attach to any interactive elements
-    const updateHoverListeners = () => {
+    const attach = () => {
       const interactables = document.querySelectorAll(
         "a, button, input, textarea, select, .interactable"
       );
       interactables.forEach((el) => {
-        el.addEventListener("mouseenter", handleHoverStart);
-        el.addEventListener("mouseleave", handleHoverEnd);
+        if (!tracked.has(el)) {
+          tracked.add(el);
+          el.addEventListener("mouseenter", handleHoverStart);
+          el.addEventListener("mouseleave", handleHoverEnd);
+        }
       });
-      return interactables;
     };
 
-    // A simple observer to attach events to newly added DOM elements
-    const observer = new MutationObserver(() => {
-      updateHoverListeners();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    attach();
 
-    let initialInteractables = updateHoverListeners();
+    const observer = new MutationObserver(attach);
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       document.removeEventListener("mousemove", onMouseMove);
-      initialInteractables.forEach((el) => {
-        el.removeEventListener("mouseenter", handleHoverStart);
-        el.removeEventListener("mouseleave", handleHoverEnd);
-      });
       observer.disconnect();
     };
   }, []);
 
-  // Use a fixed fallback if window is undefined, but since it's an effect it only runs client side
   return (
     <motion.div
       className="fixed top-0 left-0 w-4 h-4 bg-orange-400 rounded-full pointer-events-none z-[9999] mix-blend-difference"
