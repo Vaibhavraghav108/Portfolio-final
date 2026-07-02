@@ -69,9 +69,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Failed to send email:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Failed to send email:', message);
     return NextResponse.json(
-      { error: 'Failed to send message. Please try again later.' },
+      { error: `Failed to send message: ${message}` },
       { status: 500 }
     );
   }
